@@ -1,21 +1,37 @@
 const router = require('express').Router();
+const validator = require('validator');
 const { celebrate, Joi } = require('celebrate');
 const { getMovies, createMovie, deleteMovie } = require('../controllers/movies');
 
 router.get('/movies', getMovies);
 router.post('/movies', celebrate({
   body: Joi.object().keys({
-    country: Joi.string().alphanum().required(),
-    director: Joi.string().alphanum().required(),
+    country: Joi.string().required(),
+    director: Joi.string().required(),
     duration: Joi.number().required(),
-    year: Joi.string().alphanum().required(),
-    description: Joi.string().alphanum().required(),
-    image: Joi.string().uri().required(),
-    trailer: Joi.string().uri().required(),
-    thumbnail: Joi.string().uri().required(),
-    movieId: Joi.string().alphanum(),
-    nameRU: Joi.string().alphanum().required(),
-    nameEN: Joi.string().alphanum().required(),
+    year: Joi.string().required(),
+    description: Joi.string().required(),
+    image: Joi.string().required().custom((value, helpers) => {
+      if (validator.isURL(value)) {
+        return value;
+      }
+      return helpers.message('Поле заполнено не корректно!');
+    }),
+    trailer: Joi.string().required().custom((value, helpers) => {
+      if (validator.isURL(value)) {
+        return value;
+      }
+      return helpers.message('Поле заполнено не корректно!');
+    }),
+    thumbnail: Joi.string().required().custom((value, helpers) => {
+      if (validator.isURL(value)) {
+        return value;
+      }
+      return helpers.message('Поле заполнено не корректно!');
+    }),
+    movieId: Joi.number(),
+    nameRU: Joi.string().required(),
+    nameEN: Joi.string().required(),
   }),
 }), createMovie);
 router.delete('/movies/:movieId', celebrate({

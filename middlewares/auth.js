@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const UserModel = require('../models/user');
 const UnauthorizedError = require('../errors/unauthorized-error');
 const ForbiddenError = require('../errors/forbidden-error');
-const NotFoundError = require('../errors/not-found-error');
 const { errorResponse } = require('../utils/err-response');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
@@ -21,7 +20,7 @@ module.exports = (req, res, next) => {
   }
   UserModel.findById(payload.payload._id)
     .orFail(() => {
-      throw new NotFoundError('Пользователь не найден!');
+      throw new UnauthorizedError('Требуется авторизация!');
     })
     .then((user) => {
       req.user = user;

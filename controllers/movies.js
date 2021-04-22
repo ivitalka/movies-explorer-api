@@ -4,7 +4,7 @@ const MovieModel = require('../models/movie');
 const { errorResponse } = require('../utils/err-response');
 
 const getMovies = (req, res, next) => MovieModel.find({})
-  .then((movies) => res.status(200).send(movies))
+  .then((movies) => res.send(movies))
   .catch((err) => {
     errorResponse(err);
   })
@@ -12,7 +12,7 @@ const getMovies = (req, res, next) => MovieModel.find({})
 
 const createMovie = (req, res, next) => MovieModel.create({ ...req.body, owner: req.user._id })
   .then((movie) => {
-    res.status(200).send(movie);
+    res.send(movie);
   })
   .catch((err) => {
     errorResponse(err);
@@ -26,8 +26,8 @@ const deleteMovie = (req, res, next) => {
     })
     .then((movie) => {
       if (movie.owner.toString() === req.user._id.toString()) {
-        return MovieModel.findByIdAndRemove(movie._id)
-          .then(() => res.status(200).send({ message: 'Фильм удален!' }));
+        return movie.remove()
+          .then(() => res.send({ message: 'Фильм удален!' }));
       }
       throw new ForbiddenError('Нельзя удалить чужой фильм!');
     })

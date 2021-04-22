@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
+const UnauthorizedError = require('../errors/unauthorized-error');
 const { generateSign, SALT_ROUNDS } = require('../utils/jwt');
 const UserModel = require('../models/user');
 const { errorResponse } = require('../utils/err-response');
@@ -13,7 +14,7 @@ const createUser = (req, res, next) => {
   bcrypt.hash(password, SALT_ROUNDS)
     .then((hash) => UserModel.create({ email, password: hash, name }))
     .then(() => {
-      res.status(200).send({ message: 'Успешная регистрация!' });
+      res.send({ message: 'Успешная регистрация!' });
     })
     .catch((err) => {
       errorResponse(err);
@@ -28,7 +29,7 @@ const login = (req, res, next) => {
   }
   UserModel.findOne({ email }).select('+password')
     .orFail(() => {
-      throw new NotFoundError('Такой пользователь не зарегистрирован!');
+      throw new UnauthorizedError('Не верно введен email или пароль!');
     })
     .then((user) => ({
       user,
@@ -36,10 +37,10 @@ const login = (req, res, next) => {
     }))
     .then(({ user, isPasswordEqual }) => {
       if (!isPasswordEqual) {
-        throw new BadRequestError('Не верно введен email или пароль');
+        throw new UnauthorizedError('Не верно введен email или пароль!');
       }
       const token = generateSign({ _id: user._id });
-      return res.status(200).send({ token });
+      return res.send({ token });
     })
     .catch(next);
 };
@@ -48,7 +49,7 @@ const getUser = (req, res, next) => UserModel.findById(req.user._id)
   .orFail(() => {
     throw new NotFoundError('Пользователь не найден!');
   })
-  .then((user) => res.status(200).send(user))
+  .then((user) => res.send(user))
   .catch(next);
 
 const updateProfile = (req, res, next) => UserModel.findByIdAndUpdate(req.user._id, req.body,
@@ -56,7 +57,7 @@ const updateProfile = (req, res, next) => UserModel.findByIdAndUpdate(req.user._
   .orFail(() => {
     throw new NotFoundError('Пользователь не найден!');
   })
-  .then((user) => res.status(200).send(user))
+  .then((user) => res.send(user))
   .catch((err) => {
     errorResponse(err);
   })

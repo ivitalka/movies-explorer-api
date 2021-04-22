@@ -17,10 +17,10 @@ mongoose.connect(NODE_ENV === 'production' ? MONGO_DB : 'mongodb://localhost:270
 });
 
 const app = express();
+app.use(requestLogger);
 app.use(limiter);
 app.use(helmet());
 app.use(bodyParser.json());
-app.use(requestLogger);
 app.use('/', generalRouter);
 app.use(errorLogger);
 app.use(errors());
