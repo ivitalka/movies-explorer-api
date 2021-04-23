@@ -1,0 +1,3 @@
+const MONGO_DUPLICATE_ERROR_CODE = 11000;
+
+module.exports = { MONGO_DUPLICATE_ERROR_CODE };
