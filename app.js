@@ -36,7 +36,7 @@ app.use('/', generalRouter);
 app.use(errorLogger);
 app.use(errors());
 app.use((err, req, res, next) => {
-  res.status(err.statusCode).send({ message: err.message });
+  res.status(err.statusCode).send({ status: err.statusCode, message: err.message });
   next();
 });
 app.listen(PORT);
