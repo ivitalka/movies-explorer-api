@@ -32,7 +32,7 @@ router.post('/movies', celebrate({
     movieId: Joi.number(),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
-  }),
+  }).unknown(true),
 }), createMovie);
 router.delete('/movies/:movieId', celebrate({
   params: Joi.object().keys({
