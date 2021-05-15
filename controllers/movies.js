@@ -3,8 +3,11 @@ const ForbiddenError = require('../errors/forbidden-error');
 const MovieModel = require('../models/movie');
 const { errorResponse } = require('../utils/err-response');
 
-const getMovies = (req, res, next) => MovieModel.find({})
-  .then((movies) => res.send(movies))
+const getMovies = (req, res, next) => MovieModel.find({ owner: req.user._id })
+  .then((movies) => {
+    console.log(req.user._id);
+    res.send(movies);
+  })
   .catch((err) => {
     errorResponse(err);
   })
